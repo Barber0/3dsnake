@@ -1,10 +1,12 @@
 import * as BABYLON from './babylon';
 import Snake from './objects/snake';
 import Foods from './objects/foods';
+import axios from 'axios';
 class Game{
     private _canvas:any;
     private _scoreNow:any;
     private _scoreHis:any;
+    private _maxScore:any;
     private _engine:BABYLON.Engine;
     private _scene:BABYLON.Scene;
     private _camera:BABYLON.Camera;
@@ -24,11 +26,16 @@ class Game{
     private _turnAble:boolean = true;
     private _status:string = 'welcome';
 
+    private _needSend:boolean = true;
+
     constructor(canvasID:string,scoreNowID:string,scoreHisID:string){
         this._canvas = document.getElementById(canvasID);
         this._scoreNow = document.getElementById(scoreNowID);
         this._scoreHis = document.getElementById(scoreHisID);
         this._engine = new BABYLON.Engine(this._canvas,true);
+        if (localStorage.maxScore != undefined) {
+            this._maxScore = localStorage.maxScore;
+        }
     }
 
     createScene():void{
@@ -37,7 +44,7 @@ class Game{
         this._camera.attachControl(this._canvas,false);
         this._light = new BABYLON.HemisphericLight('light',new BABYLON.Vector3(0,5,0),this._scene);
 
-        this.createSky();        
+        this.createSky();
 
         let gdmt = new BABYLON.StandardMaterial('gdmt',this._scene);
         gdmt.diffuseTexture = new BABYLON.Texture('./dist/baw.jpg',this._scene);
@@ -146,6 +153,18 @@ class Game{
                 document.getElementById('score_his_1').innerHTML = this._scoreHis.innerHTML;
             }, 600);
         }
+        if (this._needSend==true && localStorage.username!=undefined) {
+            axios.get('./dist/api/api.php?action=updaterank&username='
+                +localStorage.username+"&score="+this._scoreHis.innerHTML+"&lvl=3"
+                ,{headers: {'Content-Type': 'multipart/form-data'}}
+            )
+                .then((response)=>{
+                    console.log(response);
+                }).catch((error)=>{
+                    console.log(error);
+                });
+            this._needSend = false;
+        }
     }
 
     grow():void{this._sk.add();}
@@ -164,6 +183,7 @@ class Game{
     }
 
     reset():void{
+        this._needSend = true;
         let skSeg:Array<BABYLON.Mesh> = this._sk.getMesh();
         this._status = 'playing';
         for (let i = 0; i < skSeg.length; i++) {

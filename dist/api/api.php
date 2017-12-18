@@ -17,11 +17,11 @@ if (isset($_GET['action'])) {
                 ));
             }
             break;
-        case 'get_rank':
+        case 'getrank':
             $lvl = isset($_GET['lvl'])? $_GET['lvl'] : 3; 
             echo json_encode($ctl->getRank($lvl));
             break;
-        case 'update_rank':
+        case 'updaterank':
             if (isset($_GET['username'],$_GET['score'],$_GET['lvl'])) {
                 $result = $ctl->updateRank($_GET['username'],$_GET['score'],$_GET['lvl']);
                 echo json_encode(array(

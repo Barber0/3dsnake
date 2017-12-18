@@ -58,8 +58,8 @@ class Controller{
         $link = $this->connect($this->config['db_2']['name']);
         $table = $this->config['db_2']['table'];
 
-        $check = $link->prepare("SELECT COUNT(*) as num FROM $table WHERE username = ? AND lvl = ?");
-        $check->bind_param('ss',$username,$lvl);
+        $check = $link->prepare("SELECT COUNT(*) as num,score FROM $table WHERE username = ?");
+        $check->bind_param('s',$username);
         $check->execute();
         $count = mysqli_fetch_assoc($check->get_result());
         if ($count['num']==0) {
@@ -67,20 +67,25 @@ class Controller{
             $query->bind_param('sss',$username,$score,$lvl);
             $query->execute();
             $result = $query;
-        }else {
+            mysqli_close($link);
+            return $result->affected_rows;
+        }else if($count['score']<$score && $score>4){
             $query = $link->prepare("UPDATE $table SET score = ? WHERE username = ? AND lvl = ?");
             $query->bind_param('sss',$score,$username,$lvl);
             $query->execute();
             $result = $query;
+            mysqli_close($link);
+            return $result->affected_rows;
+        }else{
+            mysqli_close($link);
+            return 0;
         }
-        mysqli_close($link);
-        return $result->affected_rows;
     }
 }
 
 // require_once "./config.php";
 // $ctl = new Controller($config);
 // // var_dump($ctl->check('ab','000000'));
-// // var_dump($ctl->getRank());
+// var_dump($ctl->getRank());
 // var_dump($ctl->updateRank('nonono',23,3));
 ?>

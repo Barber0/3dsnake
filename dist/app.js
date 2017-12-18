@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 10);
+/******/ 	return __webpack_require__(__webpack_require__.s = 11);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -70,7 +70,7 @@
 "use strict";
 
 
-var bind = __webpack_require__(4);
+var bind = __webpack_require__(5);
 var isBuffer = __webpack_require__(17);
 
 /*global toString:true*/
@@ -450,10 +450,10 @@ function getDefaultAdapter() {
   var adapter;
   if (typeof XMLHttpRequest !== 'undefined') {
     // For browsers use XHR adapter
-    adapter = __webpack_require__(6);
+    adapter = __webpack_require__(7);
   } else if (typeof process !== 'undefined') {
     // For node use HTTP adapter
-    adapter = __webpack_require__(6);
+    adapter = __webpack_require__(7);
   }
   return adapter;
 }
@@ -524,7 +524,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = defaults;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ }),
 /* 3 */
@@ -576,6 +576,12 @@ exports["default"] = Cube;
 /* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
+module.exports = __webpack_require__(16);
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
 "use strict";
 
 
@@ -591,7 +597,7 @@ module.exports = function bind(fn, thisArg) {
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -781,7 +787,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -792,7 +798,7 @@ var settle = __webpack_require__(20);
 var buildURL = __webpack_require__(22);
 var parseHeaders = __webpack_require__(23);
 var isURLSameOrigin = __webpack_require__(24);
-var createError = __webpack_require__(7);
+var createError = __webpack_require__(8);
 var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(25);
 
 module.exports = function xhrAdapter(config) {
@@ -966,10 +972,10 @@ module.exports = function xhrAdapter(config) {
   });
 };
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -994,7 +1000,7 @@ module.exports = function createError(message, config, code, request, response) 
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1006,7 +1012,7 @@ module.exports = function isCancel(value) {
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1032,23 +1038,39 @@ module.exports = Cancel;
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 exports.__esModule = true;
-var game_1 = __webpack_require__(11);
-var axios_1 = __webpack_require__(15);
+var game_1 = __webpack_require__(12);
+var axios_1 = __webpack_require__(4);
 window.addEventListener('DOMContentLoaded', function () {
     var game = new game_1["default"]('renderCanvas', 'score_now', 'score_history');
     game.createScene();
     game.doRender();
+    // let scroll = (page:number):void=>{
+    //     let hg:number = window.innerHeight,
+    //         time:number = 1000,
+    //         seg:number = 10,
+    //         count:number = 0,
+    //         loop = setInterval(()=>{
+    //             document.getElementById('welcome').style.marginTop = parseInt(document.getElementById('welcome').style.marginTop)-hg/seg*page +"px";            
+    //             count++;
+    //             if (count>=seg) {
+    //                 clearInterval(loop);
+    //             }
+    //         },time/seg);
+    // }
+    if (localStorage.username != undefined) {
+        document.getElementById('bind_form').style.display = 'none';
+        document.getElementById('check_successful').style.display = 'block';
+        document.getElementById('check_failed').style.display = 'none';
+        document.getElementById('username').innerHTML = localStorage.username;
+    }
     document.body.onkeydown = function (e) {
         game.turn(e.keyCode);
-    };
-    document.getElementById('enter').onclick = function () {
-        document.getElementById('welcome').style.display = 'none';
     };
     document.getElementById('Lt').onclick = function () {
         game.turn(65);
@@ -1071,21 +1093,48 @@ window.addEventListener('DOMContentLoaded', function () {
     document.getElementById('start').onclick = function () {
         game.start();
     };
+    document.getElementById('enter').onclick = function () {
+        document.getElementById('welcome').style.display = 'none';
+        game.reset();
+    };
     document.getElementById('reset').onclick = function () {
         game.reset();
         document.getElementById('gameover').style.display = 'none';
+    };
+    document.getElementById('rank').onclick = function () {
+        document.getElementById('rank_list').style.display = 'block';
+        document.getElementById('gameover').style.display = 'none';
+        var formData = new FormData();
+        formData.append('lvl', '3');
+        axios_1["default"].get('./dist/api/api.php?action=getrank', { headers: { 'Content-Type': 'multipart/form-data' } })
+            .then(function (response) {
+            console.log(response);
+            var content = document.getElementById('rank_content'), list = '', data = response.data;
+            data.forEach(function (element) {
+                list += "<tr><td>" + element.username + "</td><td>" + element.score + "</td></tr>";
+            });
+            content.innerHTML = list;
+        })["catch"](function (error) {
+            console.log(error);
+        });
+    };
+    document.getElementById('return').onclick = function () {
+        document.getElementById('rank_list').style.display = 'none';
+        document.getElementById('welcome').style.display = 'block';
     };
     document.getElementById('login').onclick = function () {
         var username = document.getElementById('usn').value, password = document.getElementById('pwd').value, formData = new FormData();
         formData.append('username', username);
         formData.append('password', password);
-        axios_1["default"].post('http://47.94.137.47/snake1/dist/api/api.php?action=check', formData, { headers: { 'Content-Type': 'multipart/form-data' } }).then(function (response) {
+        axios_1["default"].post('./dist/api/api.php?action=check', formData, { headers: { 'Content-Type': 'multipart/form-data' } }).then(function (response) {
             console.log(response);
-            var success = document.getElementById('check_successful'), failed = document.getElementById('check_failed');
+            var success = document.getElementById('check_successful'), failed = document.getElementById('check_failed'), bindForm = document.getElementById('bind_form');
             if (response.data.code == 0) {
+                bindForm.style.display = 'none';
                 success.style.display = 'block';
                 failed.style.display = 'none';
                 document.getElementById('username').innerHTML = username;
+                localStorage.username = username;
             }
             else {
                 success.style.display = 'none';
@@ -1100,15 +1149,16 @@ window.addEventListener('DOMContentLoaded', function () {
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 exports.__esModule = true;
 var BABYLON = __webpack_require__(1);
-var snake_1 = __webpack_require__(12);
-var foods_1 = __webpack_require__(14);
+var snake_1 = __webpack_require__(13);
+var foods_1 = __webpack_require__(15);
+var axios_1 = __webpack_require__(4);
 var Game = /** @class */ (function () {
     function Game(canvasID, scoreNowID, scoreHisID) {
         this._gdSize = 50;
@@ -1116,10 +1166,14 @@ var Game = /** @class */ (function () {
         this._agGroup = [];
         this._turnAble = true;
         this._status = 'welcome';
+        this._needSend = true;
         this._canvas = document.getElementById(canvasID);
         this._scoreNow = document.getElementById(scoreNowID);
         this._scoreHis = document.getElementById(scoreHisID);
         this._engine = new BABYLON.Engine(this._canvas, true);
+        if (localStorage.maxScore != undefined) {
+            this._maxScore = localStorage.maxScore;
+        }
     }
     Game.prototype.createScene = function () {
         this._scene = new BABYLON.Scene(this._engine);
@@ -1232,6 +1286,16 @@ var Game = /** @class */ (function () {
                 document.getElementById('score_his_1').innerHTML = _this._scoreHis.innerHTML;
             }, 600);
         }
+        if (this._needSend == true && localStorage.username != undefined) {
+            axios_1["default"].get('./dist/api/api.php?action=updaterank&username='
+                + localStorage.username + "&score=" + this._scoreHis.innerHTML + "&lvl=3", { headers: { 'Content-Type': 'multipart/form-data' } })
+                .then(function (response) {
+                console.log(response);
+            })["catch"](function (error) {
+                console.log(error);
+            });
+            this._needSend = false;
+        }
     };
     Game.prototype.grow = function () { this._sk.add(); };
     Game.prototype.addFood = function () {
@@ -1246,6 +1310,7 @@ var Game = /** @class */ (function () {
         }
     };
     Game.prototype.reset = function () {
+        this._needSend = true;
         var skSeg = this._sk.getMesh();
         this._status = 'playing';
         for (var i = 0; i < skSeg.length; i++) {
@@ -1270,14 +1335,14 @@ exports["default"] = Game;
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 exports.__esModule = true;
 var BABYLON = __webpack_require__(1);
-var item_1 = __webpack_require__(13);
+var item_1 = __webpack_require__(14);
 var Snake = /** @class */ (function () {
     function Snake(scene, posi) {
         this._sk = [];
@@ -1515,7 +1580,7 @@ exports["default"] = Snake;
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1592,7 +1657,7 @@ exports["default"] = Item;
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1678,12 +1743,6 @@ exports["default"] = Foods;
 
 
 /***/ }),
-/* 15 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(16);
-
-/***/ }),
 /* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1691,7 +1750,7 @@ module.exports = __webpack_require__(16);
 
 
 var utils = __webpack_require__(0);
-var bind = __webpack_require__(4);
+var bind = __webpack_require__(5);
 var Axios = __webpack_require__(18);
 var defaults = __webpack_require__(2);
 
@@ -1726,9 +1785,9 @@ axios.create = function create(instanceConfig) {
 };
 
 // Expose Cancel & CancelToken
-axios.Cancel = __webpack_require__(9);
+axios.Cancel = __webpack_require__(10);
 axios.CancelToken = __webpack_require__(32);
-axios.isCancel = __webpack_require__(8);
+axios.isCancel = __webpack_require__(9);
 
 // Expose all/spread
 axios.all = function all(promises) {
@@ -1881,7 +1940,7 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
 "use strict";
 
 
-var createError = __webpack_require__(7);
+var createError = __webpack_require__(8);
 
 /**
  * Resolve or reject a Promise based on response status.
@@ -2316,7 +2375,7 @@ module.exports = InterceptorManager;
 
 var utils = __webpack_require__(0);
 var transformData = __webpack_require__(29);
-var isCancel = __webpack_require__(8);
+var isCancel = __webpack_require__(9);
 var defaults = __webpack_require__(2);
 var isAbsoluteURL = __webpack_require__(30);
 var combineURLs = __webpack_require__(31);
@@ -2476,7 +2535,7 @@ module.exports = function combineURLs(baseURL, relativeURL) {
 "use strict";
 
 
-var Cancel = __webpack_require__(9);
+var Cancel = __webpack_require__(10);
 
 /**
  * A `CancelToken` is an object that can be used to request cancellation of an operation.
