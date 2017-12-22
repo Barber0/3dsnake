@@ -40,7 +40,7 @@ class Foods{
             Y = 1,
             food:Food,
             type:string = 'food_1';
-        if (this._score % 3 ==0) {
+        if (this._score+1 % 3 ==0) {
             Y = Math.random()*3+2;
             type = 'food_2';
         }

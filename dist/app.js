@@ -1068,6 +1068,7 @@ window.addEventListener('DOMContentLoaded', function () {
         document.getElementById('check_successful').style.display = 'block';
         document.getElementById('check_failed').style.display = 'none';
         document.getElementById('username').innerHTML = localStorage.username;
+        document.getElementById('score-board').style.fontSize = '20px';
     }
     document.body.onkeydown = function (e) {
         game.turn(e.keyCode);
@@ -1106,7 +1107,7 @@ window.addEventListener('DOMContentLoaded', function () {
         document.getElementById('gameover').style.display = 'none';
         var formData = new FormData();
         formData.append('lvl', '3');
-        axios_1["default"].get('./dist/api/api.php?action=getrank', { headers: { 'Content-Type': 'multipart/form-data' } })
+        axios_1["default"].post('./dist/api/api.php?action=getrank', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
             .then(function (response) {
             console.log(response);
             var content = document.getElementById('rank_content'), list = '', data = response.data;
@@ -1145,6 +1146,11 @@ window.addEventListener('DOMContentLoaded', function () {
             console.log(error);
         });
     };
+    document.getElementById('release').onclick = function () {
+        localStorage.removeItem('username');
+        document.getElementById('check_successful').style.display = 'none';
+        document.getElementById('bind_form').style.display = 'block';
+    };
 });
 
 
@@ -1171,9 +1177,9 @@ var Game = /** @class */ (function () {
         this._scoreNow = document.getElementById(scoreNowID);
         this._scoreHis = document.getElementById(scoreHisID);
         this._engine = new BABYLON.Engine(this._canvas, true);
-        if (localStorage.maxScore != undefined) {
-            this._maxScore = localStorage.maxScore;
-        }
+        // if (localStorage.maxScore != undefined) {
+        //     this._maxScore = localStorage.maxScore;
+        // }
     }
     Game.prototype.createScene = function () {
         this._scene = new BABYLON.Scene(this._engine);
@@ -1266,7 +1272,7 @@ var Game = /** @class */ (function () {
         this._sk.action();
         this._scene.registerBeforeRender(function () {
             _this._scoreNow.innerHTML = _this._foods.getScore();
-            _this._scoreHis.innerHTML = (localStorage.maxScore == undefined ? 0 : localStorage.maxScore);
+            // this._scoreHis.innerHTML = (localStorage.maxScore==undefined?0:localStorage.maxScore);
             _this._camera.setTarget(_this._sk.getPo());
             _this._camera.position.x = _this._sk.getPo().x;
             _this._camera.position.z = _this._sk.getPo().z - 30;
@@ -1287,8 +1293,12 @@ var Game = /** @class */ (function () {
             }, 600);
         }
         if (this._needSend == true && localStorage.username != undefined) {
-            axios_1["default"].get('./dist/api/api.php?action=updaterank&username='
-                + localStorage.username + "&score=" + this._scoreHis.innerHTML + "&lvl=3", { headers: { 'Content-Type': 'multipart/form-data' } })
+            // this._scoreHis.innerHTML = (localStorage.maxScore==undefined?0:localStorage.maxScore);
+            var formData = new FormData();
+            formData.append('username', localStorage.username);
+            formData.append('score', this._scoreHis.innerHTML);
+            formData.append('lvl', '3');
+            axios_1["default"].post('./dist/api/api.php?action=updaterank', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
                 .then(function (response) {
                 console.log(response);
             })["catch"](function (error) {
@@ -1700,7 +1710,7 @@ var Foods = /** @class */ (function () {
     }
     Foods.prototype.createFood = function () {
         var ranX = (Math.random() * this._gdSize - this._gdSize / 2) * 0.75, ranZ = (Math.random() * this._gdSize - this._gdSize / 2) * 0.75, Y = 1, food, type = 'food_1';
-        if (this._score % 3 == 0) {
+        if (this._score + 1 % 3 == 0) {
             Y = Math.random() * 3 + 2;
             type = 'food_2';
         }

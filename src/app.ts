@@ -24,6 +24,7 @@ window.addEventListener('DOMContentLoaded', () => {
         document.getElementById('check_successful').style.display = 'block';
         document.getElementById('check_failed').style.display = 'none';
         document.getElementById('username').innerHTML = localStorage.username;
+        document.getElementById('score-board').style.fontSize = '20px';        
     }
 
     document.body.onkeydown = (e)=>{
@@ -73,7 +74,7 @@ window.addEventListener('DOMContentLoaded', () => {
         document.getElementById('gameover').style.display = 'none';
         let formData:FormData = new FormData();
         formData.append('lvl','3');
-        axios.get('./dist/api/api.php?action=getrank',{headers: {'Content-Type': 'multipart/form-data'}})
+        axios.post('./dist/api/api.php?action=getrank',formData,{headers: {'Content-Type': 'multipart/form-data'}})
             .then((response)=>{
                 console.log(response);
                 let content = document.getElementById('rank_content'),
@@ -118,5 +119,11 @@ window.addEventListener('DOMContentLoaded', () => {
         }).catch((error)=>{
             console.log(error);
         });
+    }
+
+    document.getElementById('release').onclick = ()=>{
+        localStorage.removeItem('username');
+        document.getElementById('check_successful').style.display = 'none';
+        document.getElementById('bind_form').style.display = 'block';
     }
 });

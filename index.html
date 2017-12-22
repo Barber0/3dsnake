@@ -19,7 +19,7 @@
                     background-color: #CC0033;
                 }
     
-                #screen{
+                .screen{
                     width: 94%;
                     height: 60%;
                     text-align: center;
@@ -40,6 +40,7 @@
                         margin-top: 8%;
                         width: 86%;
                         border-radius: 2px;
+                        overflow: hidden;
                     }
                 }
     
@@ -58,8 +59,8 @@
                 }
     
                 .round-btn{
-                    width: 40px;
-                    height: 40px;
+                    width: 36px;
+                    height: 36px;
                     /* border-radius: 20px; */
                     background-color: black;
                     border: none;
@@ -85,66 +86,178 @@
                     box-shadow: none;
                 }
 
+                .table th{text-align: center;}
+                .table{border-color: black;}
+
                 .bind{margin-bottom: 5px;}
             </style>
         
-        <div id="welcome" style="width:100%;height:100%;z-index:1;font-size:20px;background-color:white;text-align:center;">
-            欢迎页<br>
-            <button id="enter">进入游戏</button>
-        </div>
-
-        <div id="gameover" style="width:100%;height:100%;z-index:1;display:none;font-size:20px;background-color:white;">
-
-            <div class="container" style="text-align:center;">
-                <div>
-                    <div>Gameover</div>
-                    <div id="check_successful" style="display:none;"><span>你好，</span><span id="username"></span></div>
-                    <div id="check_failed" style="display:none;"></div>
-                    <div><span>本次得分：</span><span id="score_now_1"></span></div>
-                    <div><span>最高纪录：</span><span id="score_his_1"></span></div>
-                </div>
-
-                <div id="bind_form">
-                    <div class="col-xs-8 col-xs-offset-2 bind" style="text-align:center;">
-                        <label>绑定iBeiKe账号，参与排名有奖品哦！</label>
-                    </div>
-                    <div class="col-xs-8 col-xs-offset-2 bind">
-                        <input type="text" name="username" class="form-control" id="usn" placeholder="iBeiKe账号" />
-                    </div>
-                    <div class="col-xs-8 col-xs-offset-2 bind">
-                        <input type="password" name="password" class="form-control" id="pwd" placeholder="密码" />
-                    </div>
-                    <div class="col-xs-8 col-xs-offset-2 bind"><button id="login" class="btn btn-success" style="width:100%;">绑定</button></div>
-                </div>
-                
-                <div class="col-xs-8 col-xs-offset-2 bind">
-                    <div class="col-xs-6" style="padding-left:0;">
-                        <button class="btn btn-danger"id="reset" style="width:100%;">再来一次</button>
-                    </div>
-                    <div class="col-xs-6" style="padding-right:0;">
-                        <button class="btn btn-warning"id="rank" style="width:100%;">排行榜</button>
+        <div id="welcome" style="width:100%;height:100%;z-index:1;">
+            <div class="screen" style="padding-top:7%;">
+                <div class="renderCanvas container" style="height:87%;margin-top:0;background-image:url('./dist/christmas1.png');background-size:cover;background-position:center;"></div>
+            </div>
+            <div id="controller">
+                <div style="width: 40%;padding-left:5%;float: left;height: 75%;">
+                    <div>
+                        <div style="height:36px;">
+                            <div style="float:left;width:36px;height:36px;"></div>
+                            <div style="float:left;width:36px;height:36px;"><button class="round-btn">F</button></div>
+                            <div style="float:left;width:36px;height:36px;"></div>
+                        </div>
+                        <div style="height:36px;">
+                            <div style="float:left;width:36px;height:36px;"><button class="round-btn">L</button></div>
+                            <div style="float:left;width:36px;height:36px;"></div>
+                            <div style="float:left;width:36px;height:36px;"><button class="round-btn">R</button></div>
+                        </div>
+                        <div style="height:36px;">
+                            <div style="float:left;width:36px;height:36px;"></div>
+                            <div style="float:left;width:36px;height:36px;"><button class="round-btn">B</button></div>
+                            <div style="float:left;width:36px;height:36px;"></div>
+                        </div>
                     </div>
                 </div>
+                <div style="width: 50%;text-align: center;float: left;height: 100%;">
+                    <div><button style="margin-top: 25px;margin-left: 120px;border-radius: 20px;" class="round-btn">U</button></div>
+                    <div><button style="margin-top: 5px;margin-left: 0px;border-radius: 20px;" class="round-btn">D</button></div>
+                </div>
+            </div>
+            <div style="width:100%;text-align:center;">
+                <button id="enter" style="height:25px;width:50px;" class="round-btn">开始</button>
             </div>
         </div>
 
-        <div id="rank_list" class="container" style="height:100%;display:none;background-color:white;">
-            <div class="container">
+        <div id="gameover" style="width:100%;height:100%;z-index:1;display:none;">
+            <div class="screen" style="padding-top:7%;">
+                <div class="renderCanvas container" style="height:87%;margin-top:0;">
+                    <div class="container" style="text-align:center;background-image:url('./dist/ct1.png');background-position:center;background-size:cover;height:103%;color:white;">
+                        <div style="min-height:80%;">
+                            <div id="score-board">
+                                <div style="font-size:25px;">Gameover</div>
+                                <div id="check_successful" style="display:none;overflow:hidden;height:60px;margin-top:28px;">
+                                    <label style="font-size:18px">
+                                        <span>你好，</span><span id="username"></span>
+                                    </label>
+                                    <div class="col-xs-6 col-xs-offset-3">
+                                        <a id="release">解绑</a>
+                                    </div>
+                                </div>
+                                <div id="check_failed" style="display:none;"></div>
+                                <div><span>本次得分：</span><span id="score_now_1"></span></div>
+                                <div><span>最高纪录：</span><span id="score_his_1"></span></div>
+                            </div>
+            
+                            <div id="bind_form">
+                                <div class="bind" style="text-align:center;">
+                                    <label style="font-size:15px;">绑定iBeiKe账号，参与排名，精美奖品等你拿哦！</label>
+                                </div>
+                                <div class="bind">
+                                    <input type="text" name="username" class="form-control" id="usn" placeholder="iBeiKe账号" />
+                                </div>
+                                <div class="bind">
+                                    <input type="password" name="password" class="form-control" id="pwd" placeholder="密码" />
+                                </div>
+                                <div class="bind"><button id="login" class="btn btn-success" style="width:100%;">绑定</button></div>
+                            </div>
+                        </div>
+                        
+                        
+                        <div class="bind">
+                            <div class="col-xs-6" style="padding-left:0;">
+                                <button class="btn btn-warning"id="reset" style="width:100%;">再来一次</button>
+                            </div>
+                            <div class="col-xs-6" style="padding-right:0;">
+                                <button class="btn btn-danger"id="rank" style="width:100%;">排行榜</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="controller">
+                <div style="width: 40%;padding-left:5%;float: left;height: 75%;">
+                    <div>
+                        <div style="height:36px;">
+                            <div style="float:left;width:36px;height:36px;"></div>
+                            <div style="float:left;width:36px;height:36px;"><button class="round-btn">F</button></div>
+                            <div style="float:left;width:36px;height:36px;"></div>
+                        </div>
+                        <div style="height:36px;">
+                            <div style="float:left;width:36px;height:36px;"><button class="round-btn">L</button></div>
+                            <div style="float:left;width:36px;height:36px;"></div>
+                            <div style="float:left;width:36px;height:36px;"><button class="round-btn">R</button></div>
+                        </div>
+                        <div style="height:36px;">
+                            <div style="float:left;width:36px;height:36px;"></div>
+                            <div style="float:left;width:36px;height:36px;"><button class="round-btn">B</button></div>
+                            <div style="float:left;width:36px;height:36px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div style="width: 50%;text-align: center;float: left;height: 100%;">
+                    <div><button style="margin-top: 25px;margin-left: 120px;border-radius: 20px;" class="round-btn">U</button></div>
+                    <div><button style="margin-top: 5px;margin-left: 0px;border-radius: 20px;" class="round-btn">D</button></div>
+                </div>
+            </div>
+            <div style="width:100%;text-align:center;">
+                <button id="enter" style="height:25px;width:50px;" class="round-btn">开始</button>
+            </div>
+        </div>
+
+        <div id="rank_list" style="height:100%;display:none;">
+            <!-- <div class="container">
                 <div style="text-align:center"><h1>排行榜</h1></div>
                 <table class="table table-hover">
                     <thead><th>用户名</th><th>得分</th></thead>
-                    <tbody id="rank_content">
-                        <tr><td>abc</td><td>666</td></tr>
-                    </tbody>
+                    <tbody id="rank_content"></tbody>
                 </table>
             </div>
             <div class="container" style="text-align:center;">
                 <button id="return" class="btn btn-info">返回首页</button>
+            </div> -->
+
+            <div class="screen" style="padding-top:7%;">
+                <div class="renderCanvas container" style="height:87%;margin-top:0;background-image:url('./dist/paper.jpg');background-position:center;background-size:cover;">
+                    <div style="text-align:center;font-size:20px;margin-top:5px;">排行榜</div>
+                    <table class="table table-condensed container" style="width:80%;">
+                        <thead><th>用户名</th><th>得分</th></thead>
+                        <tbody id="rank_content"></tbody>
+                    </table>
+                    <div style="text-align:center">
+                        <button id="return" class="btn btn-danger">返回首页</button>
+                    </div>
+                </div>
+            </div>
+            <div id="controller">
+                <div style="width: 40%;padding-left:5%;float: left;height: 75%;">
+                    <div>
+                        <div style="height:36px;">
+                            <div style="float:left;width:36px;height:36px;"></div>
+                            <div style="float:left;width:36px;height:36px;"><button class="round-btn">F</button></div>
+                            <div style="float:left;width:36px;height:36px;"></div>
+                        </div>
+                        <div style="height:36px;">
+                            <div style="float:left;width:36px;height:36px;"><button class="round-btn">L</button></div>
+                            <div style="float:left;width:36px;height:36px;"></div>
+                            <div style="float:left;width:36px;height:36px;"><button class="round-btn">R</button></div>
+                        </div>
+                        <div style="height:36px;">
+                            <div style="float:left;width:36px;height:36px;"></div>
+                            <div style="float:left;width:36px;height:36px;"><button class="round-btn">B</button></div>
+                            <div style="float:left;width:36px;height:36px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div style="width: 50%;text-align: center;float: left;height: 100%;">
+                    <div><button style="margin-top: 25px;margin-left: 120px;border-radius: 20px;" class="round-btn">U</button></div>
+                    <div><button style="margin-top: 5px;margin-left: 0px;border-radius: 20px;" class="round-btn">D</button></div>
+                </div>
+            </div>
+            <div style="width:100%;text-align:center;">
+                <button id="enter" style="height:25px;width:50px;" class="round-btn">开始</button>
             </div>
         </div>
 
         <div style="height:100%;">
-            <div id="screen">
+            <div class="screen">
                 <canvas id="renderCanvas" class="renderCanvas"></canvas>            
                 <!-- <div class="renderCanvas" style="background-color:white;"></div>            -->
                 <div id="score">
@@ -153,33 +266,32 @@
                 </div>
             </div>
             <div id="controller">
-                <div style="width: 40%;padding-left:10%;float: left;height: 75%;">
+                <div style="width: 40%;padding-left:5%;float: left;height: 75%;">
                     <div>
-                        <div style="height:40px;">
-                            <div style="float:left;width:40px;height:40px;"></div>
-                            <div style="float:left;width:40px;height:40px;"><button id="Ft" class="round-btn">F</button></div>
-                            <div style="float:left;width:40px;height:40px;"></div>
+                        <div style="height:36px;">
+                            <div style="float:left;width:36px;height:36px;"></div>
+                            <div style="float:left;width:36px;height:36px;"><button id="Ft" class="round-btn">F</button></div>
+                            <div style="float:left;width:36px;height:36px;"></div>
                         </div>
-                        <div style="height:40px;">
-                            <div style="float:left;width:40px;height:40px;"><button id="Lt" class="round-btn">L</button></div>
-                            <div style="float:left;width:40px;height:40px;"></div>
-                            <div style="float:left;width:40px;height:40px;"><button id="Rt" class="round-btn">R</button></div>
+                        <div style="height:36px;">
+                            <div style="float:left;width:36px;height:36px;"><button id="Lt" class="round-btn">L</button></div>
+                            <div style="float:left;width:36px;height:36px;"></div>
+                            <div style="float:left;width:36px;height:36px;"><button id="Rt" class="round-btn">R</button></div>
                         </div>
-                        <div style="height:40px;">
-                            <div style="float:left;width:40px;height:40px;"></div>
-                            <div style="float:left;width:40px;height:40px;"><button id="Bk" class="round-btn">B</button></div>
-                            <div style="float:left;width:40px;height:40px;"></div>
+                        <div style="height:36px;">
+                            <div style="float:left;width:36px;height:36px;"></div>
+                            <div style="float:left;width:36px;height:36px;"><button id="Bk" class="round-btn">B</button></div>
+                            <div style="float:left;width:36px;height:36px;"></div>
                         </div>
                     </div>
                 </div>
                 <div style="width: 50%;text-align: center;float: left;height: 100%;">
-                    <div><button id="Up" style="margin-top: 25px;margin-left: 50px;border-radius: 20px;" class="round-btn">U</button></div>
-                    <div><button id="Dn" style="margin-top: 5px;margin-left: -70px;border-radius: 20px;" class="round-btn">D</button></div>
+                    <div><button id="Up" style="margin-top: 25px;margin-left: 120px;border-radius: 20px;" class="round-btn">U</button></div>
+                    <div><button id="Dn" style="margin-top: 5px;margin-left: 0px;border-radius: 20px;" class="round-btn">D</button></div>
                 </div>
             </div>
             <div style="width:100%;text-align:center;">
-                <button id="start" style="height:25px" class="round-btn">开始</button>
-                <!-- <button id="reset" style="height:25px;margin-left:20px;" class="round-btn">重置</button> -->
+                <button id="start" style="height:25px;width:50px;" class="round-btn">开始</button>
             </div>
         </div>
         

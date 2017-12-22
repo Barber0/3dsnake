@@ -33,9 +33,9 @@ class Game{
         this._scoreNow = document.getElementById(scoreNowID);
         this._scoreHis = document.getElementById(scoreHisID);
         this._engine = new BABYLON.Engine(this._canvas,true);
-        if (localStorage.maxScore != undefined) {
-            this._maxScore = localStorage.maxScore;
-        }
+        // if (localStorage.maxScore != undefined) {
+        //     this._maxScore = localStorage.maxScore;
+        // }
     }
 
     createScene():void{
@@ -132,7 +132,7 @@ class Game{
             this._sk.action();
             this._scene.registerBeforeRender(()=>{
                 this._scoreNow.innerHTML = this._foods.getScore();
-                this._scoreHis.innerHTML = (localStorage.maxScore==undefined?0:localStorage.maxScore);
+                // this._scoreHis.innerHTML = (localStorage.maxScore==undefined?0:localStorage.maxScore);
                 
                 this._camera.setTarget(this._sk.getPo());
                 this._camera.position.x = this._sk.getPo().x;
@@ -154,9 +154,14 @@ class Game{
             }, 600);
         }
         if (this._needSend==true && localStorage.username!=undefined) {
-            axios.get('./dist/api/api.php?action=updaterank&username='
-                +localStorage.username+"&score="+this._scoreHis.innerHTML+"&lvl=3"
-                ,{headers: {'Content-Type': 'multipart/form-data'}}
+            // this._scoreHis.innerHTML = (localStorage.maxScore==undefined?0:localStorage.maxScore);
+            let formData = new FormData();
+            formData.append('username',localStorage.username);
+            formData.append('score',this._scoreHis.innerHTML);
+            formData.append('lvl','3');
+            axios.post('./dist/api/api.php?action=updaterank',
+                formData,
+                {headers: {'Content-Type': 'multipart/form-data'}}
             )
                 .then((response)=>{
                     console.log(response);
