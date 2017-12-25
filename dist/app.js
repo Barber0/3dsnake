@@ -1047,6 +1047,10 @@ exports.__esModule = true;
 var game_1 = __webpack_require__(12);
 var axios_1 = __webpack_require__(4);
 window.addEventListener('DOMContentLoaded', function () {
+    var bgmPlayer = document.getElementById('bgm');
+    bgmPlayer.loop = true;
+    bgmPlayer.autoplay = true;
+    bgmPlayer.play();
     var game = new game_1["default"]('renderCanvas', 'score_now', 'score_history');
     game.createScene();
     game.doRender();
@@ -1096,7 +1100,7 @@ window.addEventListener('DOMContentLoaded', function () {
     };
     document.getElementById('enter').onclick = function () {
         document.getElementById('welcome').style.display = 'none';
-        game.reset();
+        game.reset(true);
     };
     document.getElementById('reset').onclick = function () {
         game.reset();
@@ -1148,6 +1152,7 @@ window.addEventListener('DOMContentLoaded', function () {
     };
     document.getElementById('release').onclick = function () {
         localStorage.removeItem('username');
+        localStorage.removeItem('maxScore');
         document.getElementById('check_successful').style.display = 'none';
         document.getElementById('bind_form').style.display = 'block';
     };
@@ -1173,13 +1178,14 @@ var Game = /** @class */ (function () {
         this._turnAble = true;
         this._status = 'welcome';
         this._needSend = true;
+        this._bgmPlayer = document.getElementById('bgm');
         this._canvas = document.getElementById(canvasID);
         this._scoreNow = document.getElementById(scoreNowID);
         this._scoreHis = document.getElementById(scoreHisID);
         this._engine = new BABYLON.Engine(this._canvas, true);
-        // if (localStorage.maxScore != undefined) {
-        //     this._maxScore = localStorage.maxScore;
-        // }
+        if (localStorage.maxScore != undefined) {
+            this._maxScore = localStorage.maxScore;
+        }
     }
     Game.prototype.createScene = function () {
         this._scene = new BABYLON.Scene(this._engine);
@@ -1192,14 +1198,12 @@ var Game = /** @class */ (function () {
         gdmt.diffuseColor = new BABYLON.Color3(0.9, 0.9, 0.9);
         this._ground = BABYLON.MeshBuilder.CreateGround('gr', { width: this._gdSize, height: this._gdSize, subdivisions: 2 }, this._scene);
         this._ground.material = gdmt;
-        this._sk = new snake_1["default"](this._scene, new BABYLON.Vector3(0, 1, 0));
+        this._sk = new snake_1["default"](this._scene, new BABYLON.Vector3(0, 1, 0), this._ground);
         this._camera.setTarget(this._sk.getPo());
         this._foods = new foods_1["default"](this._scene, this._gdSize);
         this._stepSeg = this._sk.getStepSeg();
         this._unitAg = this._turnAg / this._stepSeg;
         this.createAg(30);
-        this.start();
-        this.reset();
     };
     Game.prototype.createAg = function (radius) {
         for (var i = 0; i < this._stepSeg; i++) {
@@ -1269,10 +1273,12 @@ var Game = /** @class */ (function () {
         var unitTime = this._sk.getUnitTime();
         if (this._status == 'welcome')
             this._status = 'playing';
-        this._sk.action();
+        // this._sk.action();
+        this._sk.setOrbit();
         this._scene.registerBeforeRender(function () {
             _this._scoreNow.innerHTML = _this._foods.getScore();
-            // this._scoreHis.innerHTML = (localStorage.maxScore==undefined?0:localStorage.maxScore);
+            _this._scoreHis.innerHTML = (localStorage.maxScore == undefined ? 0 : localStorage.maxScore);
+            _this._sk.action();
             _this._camera.setTarget(_this._sk.getPo());
             _this._camera.position.x = _this._sk.getPo().x;
             _this._camera.position.z = _this._sk.getPo().z - 30;
@@ -1282,8 +1288,8 @@ var Game = /** @class */ (function () {
     };
     Game.prototype.stop = function () {
         var _this = this;
+        this._bgmPlayer.pause();
         this._sk.stop(this._foods.getScore());
-        clearInterval(this._cameraLoop);
         if (this._status == 'playing') {
             this._status = 'gameover';
             setTimeout(function () {
@@ -1293,7 +1299,7 @@ var Game = /** @class */ (function () {
             }, 600);
         }
         if (this._needSend == true && localStorage.username != undefined) {
-            // this._scoreHis.innerHTML = (localStorage.maxScore==undefined?0:localStorage.maxScore);
+            this._scoreHis.innerHTML = (localStorage.maxScore == undefined ? 0 : localStorage.maxScore);
             var formData = new FormData();
             formData.append('username', localStorage.username);
             formData.append('score', this._scoreHis.innerHTML);
@@ -1308,8 +1314,9 @@ var Game = /** @class */ (function () {
         }
     };
     Game.prototype.grow = function () { this._sk.add(); };
-    Game.prototype.addFood = function () {
-        this._foods.createFood();
+    Game.prototype.addFood = function (isFloat) {
+        if (isFloat === void 0) { isFloat = false; }
+        this._foods.createFood(isFloat);
     };
     Game.prototype.judge = function () {
         var po = this._sk.getPo();
@@ -1319,7 +1326,10 @@ var Game = /** @class */ (function () {
             this.stop();
         }
     };
-    Game.prototype.reset = function () {
+    Game.prototype.reset = function (bgmIsPlaying) {
+        if (bgmIsPlaying === void 0) { bgmIsPlaying = false; }
+        if (bgmIsPlaying == false)
+            this._bgmPlayer.load();
         this._needSend = true;
         var skSeg = this._sk.getMesh();
         this._status = 'playing';
@@ -1328,10 +1338,12 @@ var Game = /** @class */ (function () {
         }
         this._sk.stop(this._foods.getScore());
         this._foods.clean();
-        this._sk = new snake_1["default"](this._scene, new BABYLON.Vector3(0, 1, 0));
+        this._sk = new snake_1["default"](this._scene, new BABYLON.Vector3(0, 1, 0), this._ground);
         this._foods = new foods_1["default"](this._scene, this._gdSize);
         for (var i = 0; i < 3; i++)
             this.addFood();
+        for (var i = 0; i < 3; i++)
+            this.addFood(true);
     };
     Game.prototype.cameraFollow = function () {
         // let po = this._sk.getPo();
@@ -1354,7 +1366,7 @@ exports.__esModule = true;
 var BABYLON = __webpack_require__(1);
 var item_1 = __webpack_require__(14);
 var Snake = /** @class */ (function () {
-    function Snake(scene, posi) {
+    function Snake(scene, posi, gd) {
         this._sk = [];
         this._size = 2;
         this._scaling = 0.8;
@@ -1363,10 +1375,11 @@ var Snake = /** @class */ (function () {
         this._addAble = false;
         this._orbit = [];
         this._stepTime = 180;
-        this._stepSeg = 8;
+        this._stepSeg = 9;
         this._stepCount = 0;
-        this._isRuning = false;
+        this._isRuning = true;
         this._roof = 18;
+        this._gd = gd;
         this._startPo = posi;
         for (var i = 0; i < 8; i++) {
             this._sk.push(new item_1["default"]('sk_' + i, this._scene, new BABYLON.Vector3(this._startPo.x, this._startPo.y, this._startPo.z - this._size * i), this._size, this._stepTime, this._stepSeg, this._scaling));
@@ -1405,7 +1418,7 @@ var Snake = /** @class */ (function () {
                 }
                 break;
             case 'down':
-                if (po.y > 1) {
+                if (po.y > this._gd.position.y + 2) {
                     this._orbit.unshift(new BABYLON.Vector3(po.x, po.y - this._size * 1.5, po.z));
                     this._orbit.pop();
                 }
@@ -1442,30 +1455,26 @@ var Snake = /** @class */ (function () {
     };
     Snake.prototype.action = function () {
         var _this = this;
-        if (this._isRuning == false) {
-            this.setOrbit();
-            this._actionLoop = setInterval(function () {
-                _this._stepCount++;
-                if (_this._stepCount >= _this._stepSeg) {
-                    _this.setOrbit();
-                    var len = _this._sk.length;
-                    if (_this._addAble == true) {
-                        len++;
-                    }
-                    for (var i = 1; i < len; i++) {
-                        if (_this._addAble == true) {
-                            _this.grow();
-                            _this._addAble = false;
-                        }
+        if (this._isRuning == true) {
+            this._stepCount++;
+            if (this._stepCount >= this._stepSeg) {
+                this.setOrbit();
+                var len = this._sk.length;
+                if (this._addAble == true) {
+                    len++;
+                }
+                for (var i = 1; i < len; i++) {
+                    if (this._addAble == true) {
+                        this.grow();
+                        this._addAble = false;
                     }
                 }
-                _this._orbit.forEach(function (val, index) {
-                    _this._sk[index].follow(val);
-                });
-                if (_this._stepCount >= _this._stepSeg)
-                    _this._stepCount = 0;
-            }, this._stepTime / this._stepSeg);
-            this._isRuning = true;
+            }
+            this._orbit.forEach(function (val, index) {
+                _this._sk[index].follow(val);
+            });
+            if (this._stepCount >= this._stepSeg)
+                this._stepCount = 0;
         }
     };
     Snake.prototype.turnUp = function () {
@@ -1574,7 +1583,6 @@ var Snake = /** @class */ (function () {
         return false;
     };
     Snake.prototype.stop = function (score) {
-        clearInterval(this._actionLoop);
         this._isRuning = false;
     };
     Snake.prototype.getMesh = function () {
@@ -1643,7 +1651,7 @@ var Item = /** @class */ (function (_super) {
                 clearInterval(actionLoop);
             else
                 count--;
-        }, this._stepTime / this._stepSeg);
+        }, 10);
     };
     Item.prototype.turnRt = function () {
         var _this = this;
@@ -1653,7 +1661,7 @@ var Item = /** @class */ (function (_super) {
                 clearInterval(actionLoop);
             else
                 count--;
-        }, this._stepTime / this._stepSeg);
+        }, 10);
     };
     Item.prototype.follow = function (posi) {
         var unitTime = (this._stepTime / this._stepSeg), vx = posi.x - this._posi.x, vy = posi.y - this._posi.y, vz = posi.z - this._posi.z, unitSize_x = vx / this._stepSeg, unitSize_y = vy / this._stepSeg, unitSize_z = vz / this._stepSeg;
@@ -1690,6 +1698,7 @@ var Food = /** @class */ (function (_super) {
     function Food(name, scene, posi, size, scaling, type) {
         var _this = _super.call(this, name, scene, posi, size, scaling, type) || this;
         _this.score = 0;
+        _this.type = type;
         if (type == 'food_1') {
             _this.score = 1;
         }
@@ -1702,35 +1711,48 @@ var Food = /** @class */ (function (_super) {
 }(cube_1["default"]));
 var Foods = /** @class */ (function () {
     function Foods(scene, gdSize) {
-        this._foods = [];
+        this._foods_1 = [];
+        this._foods_2 = [];
         this._count = 0;
         this._score = 0;
         this._scene = scene;
         this._gdSize = gdSize;
     }
-    Foods.prototype.createFood = function () {
+    Foods.prototype.createFood = function (isFloat) {
+        if (isFloat === void 0) { isFloat = false; }
         var ranX = (Math.random() * this._gdSize - this._gdSize / 2) * 0.75, ranZ = (Math.random() * this._gdSize - this._gdSize / 2) * 0.75, Y = 1, food, type = 'food_1';
-        if (this._score + 1 % 3 == 0) {
+        if (isFloat == true) {
             Y = Math.random() * 3 + 2;
-            type = 'food_2';
+            food = new Food('food_' + this._count, this._scene, new BABYLON.Vector3(ranX, Y, ranZ), 2, 0.9, 'food_2');
+            this._foods_2.push(food);
         }
-        food = new Food('food_' + this._count, this._scene, new BABYLON.Vector3(ranX, Y, ranZ), 2, 0.9, type);
-        this._foods.push(food);
+        else {
+            food = new Food('food_' + this._count, this._scene, new BABYLON.Vector3(ranX, Y, ranZ), 2, 0.9, 'food_1');
+            this._foods_1.push(food);
+        }
+        11;
     };
-    Foods.prototype.eaten = function (index) {
-        this._score += this._foods[index].score;
-        this._foods[index].remove();
-        this._foods.splice(index, 1);
-        this.createFood();
+    Foods.prototype.eaten_1 = function (index) {
+        this._score += this._foods_1[index].score;
+        this._foods_1[index].remove();
+        this._foods_1.splice(index, 1);
+        this.createFood(false);
+    };
+    Foods.prototype.eaten_2 = function (index) {
+        this._score += this._foods_2[index].score;
+        this._foods_2[index].remove();
+        this._foods_2.splice(index, 1);
+        this.createFood(true);
     };
     Foods.prototype.check = function (point, sk) {
+        var _this = this;
         var score = 0;
-        for (var i = 0; i < this._foods.length; i++)
-            if (this._foods[i].getDis(point) < 1.5) {
-                this.eaten(i);
+        this._foods_1.forEach(function (val, idx) {
+            if (val.getDis(point) < 1.5) {
+                _this.eaten_1(idx);
                 if (localStorage.maxScore) {
-                    if (this._score > localStorage.maxScore) {
-                        localStorage.maxScore = this._score;
+                    if (_this._score > localStorage.maxScore) {
+                        localStorage.maxScore = _this._score;
                     }
                 }
                 else {
@@ -1738,14 +1760,34 @@ var Foods = /** @class */ (function () {
                 }
                 sk.grow();
             }
+        });
+        this._foods_2.forEach(function (val, idx) {
+            if (val.getDis(point) < 1.5) {
+                _this.eaten_2(idx);
+                if (localStorage.maxScore) {
+                    if (_this._score > localStorage.maxScore) {
+                        localStorage.maxScore = _this._score;
+                    }
+                }
+                else {
+                    localStorage.maxScore = 0;
+                }
+                sk.grow();
+            }
+        });
     };
     Foods.prototype.getScore = function () { return this._score; };
     Foods.prototype.clean = function () {
-        for (var i = 0; i < this._foods.length; i++) {
-            this._foods[i].remove();
-        }
+        var _this = this;
+        this._foods_1.forEach(function (val, idx) {
+            _this._foods_1[idx].remove();
+        });
+        this._foods_2.forEach(function (val, idx) {
+            _this._foods_2[idx].remove();
+        });
         this._score = 0;
-        this._foods = [];
+        this._foods_1 = [];
+        this._foods_2 = [];
     };
     return Foods;
 }());

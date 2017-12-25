@@ -27,15 +27,16 @@ class Game{
     private _status:string = 'welcome';
 
     private _needSend:boolean = true;
+    private _bgmPlayer:HTMLAudioElement = (document.getElementById('bgm') as HTMLAudioElement);
 
     constructor(canvasID:string,scoreNowID:string,scoreHisID:string){
         this._canvas = document.getElementById(canvasID);
         this._scoreNow = document.getElementById(scoreNowID);
         this._scoreHis = document.getElementById(scoreHisID);
         this._engine = new BABYLON.Engine(this._canvas,true);
-        // if (localStorage.maxScore != undefined) {
-        //     this._maxScore = localStorage.maxScore;
-        // }
+        if (localStorage.maxScore != undefined) {
+            this._maxScore = localStorage.maxScore;
+        }
     }
 
     createScene():void{
@@ -54,7 +55,7 @@ class Game{
             {width:this._gdSize,height:this._gdSize,subdivisions:2},this._scene);
         this._ground.material = gdmt;
 
-        this._sk = new Snake(this._scene,new BABYLON.Vector3(0,1,0));
+        this._sk = new Snake(this._scene,new BABYLON.Vector3(0,1,0),this._ground);
         this._camera.setTarget(this._sk.getPo());
         this._foods = new Foods(this._scene,this._gdSize);
         
@@ -63,8 +64,6 @@ class Game{
 
         this.createAg(30);
 
-        this.start();
-        this.reset();
     }
     
     createAg(radius:number):void{
@@ -129,11 +128,12 @@ class Game{
     start():void{
             let unitTime = this._sk.getUnitTime();
             if (this._status=='welcome') this._status = 'playing';
-            this._sk.action();
+            // this._sk.action();
+            this._sk.setOrbit();
             this._scene.registerBeforeRender(()=>{
                 this._scoreNow.innerHTML = this._foods.getScore();
-                // this._scoreHis.innerHTML = (localStorage.maxScore==undefined?0:localStorage.maxScore);
-                
+                this._scoreHis.innerHTML = (localStorage.maxScore==undefined?0:localStorage.maxScore);
+                this._sk.action();
                 this._camera.setTarget(this._sk.getPo());
                 this._camera.position.x = this._sk.getPo().x;
                 this._camera.position.z = this._sk.getPo().z - 30;
@@ -143,8 +143,8 @@ class Game{
     }
 
     stop():void{
+        this._bgmPlayer.pause();
         this._sk.stop(this._foods.getScore());
-        clearInterval(this._cameraLoop);
         if (this._status=='playing') {
             this._status = 'gameover';
             setTimeout(() => {
@@ -154,7 +154,7 @@ class Game{
             }, 600);
         }
         if (this._needSend==true && localStorage.username!=undefined) {
-            // this._scoreHis.innerHTML = (localStorage.maxScore==undefined?0:localStorage.maxScore);
+            this._scoreHis.innerHTML = (localStorage.maxScore==undefined?0:localStorage.maxScore);
             let formData = new FormData();
             formData.append('username',localStorage.username);
             formData.append('score',this._scoreHis.innerHTML);
@@ -174,8 +174,8 @@ class Game{
 
     grow():void{this._sk.add();}
 
-    addFood():void{
-        this._foods.createFood();
+    addFood(isFloat:boolean=false):void{
+        this._foods.createFood(isFloat);
     }
 
     judge():void{
@@ -187,7 +187,8 @@ class Game{
         }
     }
 
-    reset():void{
+    reset(bgmIsPlaying:boolean = false):void{
+        if (bgmIsPlaying == false) this._bgmPlayer.load();
         this._needSend = true;
         let skSeg:Array<BABYLON.Mesh> = this._sk.getMesh();
         this._status = 'playing';
@@ -196,9 +197,10 @@ class Game{
         }
         this._sk.stop(this._foods.getScore());
         this._foods.clean();
-        this._sk = new Snake(this._scene,new BABYLON.Vector3(0,1,0));
+        this._sk = new Snake(this._scene,new BABYLON.Vector3(0,1,0),this._ground);
         this._foods = new Foods(this._scene,this._gdSize);
         for (let i = 0; i < 3; i++) this.addFood();
+        for (let i = 0; i < 3; i++) this.addFood(true);
     }
 
     cameraFollow():void{

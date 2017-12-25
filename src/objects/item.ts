@@ -50,7 +50,7 @@ class Item extends Cube{
             actionLoop = setInterval(()=>{
             this._rota.y -= unitAg;
             if (count<2) clearInterval(actionLoop); else count--;
-        },this._stepTime/this._stepSeg);
+        },10);
     }
 
     turnRt():void{
@@ -59,7 +59,7 @@ class Item extends Cube{
             actionLoop = setInterval(()=>{
                 this._rota.y += unitAg;
                 if (count<2) clearInterval(actionLoop); else count--;
-            },this._stepTime/this._stepSeg);
+            },10);
     }
 
     follow(posi:BABYLON.Vector3):void{

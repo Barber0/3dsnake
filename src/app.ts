@@ -1,6 +1,10 @@
 import Game from './game';
 import axios from 'axios';
 window.addEventListener('DOMContentLoaded', () => {
+    let bgmPlayer = (document.getElementById('bgm') as HTMLAudioElement);
+    bgmPlayer.loop = true;
+    bgmPlayer.autoplay = true;
+    bgmPlayer.play();
     let game = new Game('renderCanvas','score_now','score_history');
     game.createScene();
     game.doRender();
@@ -61,7 +65,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('enter').onclick = ()=>{
         document.getElementById('welcome').style.display = 'none';
-        game.reset();        
+        game.reset(true);      
     }
 
     document.getElementById('reset').onclick = ()=>{
@@ -123,6 +127,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('release').onclick = ()=>{
         localStorage.removeItem('username');
+        localStorage.removeItem('maxScore');
         document.getElementById('check_successful').style.display = 'none';
         document.getElementById('bind_form').style.display = 'block';
     }

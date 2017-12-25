@@ -12,12 +12,14 @@ class Snake{
     private _orbit:Array<BABYLON.Vector3> = [];
     private _actionLoop:any;
     private _stepTime:number = 180;
-    private _stepSeg:number = 8;
+    private _stepSeg:number = 9;
     private _stepCount:number = 0;
-    private _isRuning:boolean = false;
+    private _isRuning:boolean = true;
     private _roof:number = 18;
+    private _gd:BABYLON.Mesh;
 
-    constructor(scene:BABYLON.Scene,posi:BABYLON.Vector3){
+    constructor(scene:BABYLON.Scene,posi:BABYLON.Vector3,gd:BABYLON.Mesh){
+        this._gd = gd;
         this._startPo = posi;
         for (let i = 0; i < 8; i++) {
             this._sk.push(new Item(
@@ -61,7 +63,7 @@ class Snake{
                 }
                 break;
             case 'down':
-                if (po.y > 1) {
+                if (po.y > this._gd.position.y+2) {
                     this._orbit.unshift(new BABYLON.Vector3(po.x,po.y-this._size*1.5,po.z));
                     this._orbit.pop();
                 }else{
@@ -98,29 +100,25 @@ class Snake{
     }
 
     action():void{
-        if (this._isRuning==false) {
-            this.setOrbit();
-            this._actionLoop = setInterval(()=>{
-                this._stepCount++;
-                if (this._stepCount>=this._stepSeg) {
-                    this.setOrbit();
-                    let len = this._sk.length;
+        if (this._isRuning==true) {
+            this._stepCount++;
+            if (this._stepCount>=this._stepSeg) {
+                this.setOrbit();
+                let len = this._sk.length;
+                if (this._addAble==true) {
+                    len++;
+                }
+                for (let i = 1; i < len; i++) {
                     if (this._addAble==true) {
-                        len++;
-                    }
-                    for (let i = 1; i < len; i++) {
-                        if (this._addAble==true) {
-                            this.grow();
-                            this._addAble = false;
-                        }
+                        this.grow();
+                        this._addAble = false;
                     }
                 }
-                this._orbit.forEach((val,index)=>{
-                    this._sk[index].follow(val);
-                })
-                if (this._stepCount>=this._stepSeg) this._stepCount = 0;
-            },this._stepTime/this._stepSeg);
-            this._isRuning = true;
+            }
+            this._orbit.forEach((val,index)=>{
+                this._sk[index].follow(val);
+            })
+            if (this._stepCount>=this._stepSeg) this._stepCount = 0;
         }
     }
 
@@ -237,7 +235,7 @@ class Snake{
     }
 
     stop(score:number):void{
-        clearInterval(this._actionLoop);this._isRuning = false;
+        this._isRuning = false;
     }
 
     getMesh():Array<BABYLON.Mesh>{

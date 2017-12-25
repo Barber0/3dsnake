@@ -40,7 +40,7 @@
                         margin-top: 8%;
                         width: 86%;
                         border-radius: 2px;
-                        overflow: hidden;
+                        overflow-y: scroll;
                     }
                 }
     
@@ -91,6 +91,11 @@
 
                 .bind{margin-bottom: 5px;}
             </style>
+
+        <audio id="bgm" controls="controls" style="display:none;">
+            <source src="./dist/htf.mp3" type="audio/mpeg">
+        <embed src="./dist/htf.mp3" />
+        </audio>
         
         <div id="welcome" style="width:100%;height:100%;z-index:1;">
             <div class="screen" style="padding-top:7%;">
@@ -116,19 +121,19 @@
                         </div>
                     </div>
                 </div>
-                <div style="width: 50%;text-align: center;float: left;height: 100%;">
-                    <div><button style="margin-top: 25px;margin-left: 120px;border-radius: 20px;" class="round-btn">U</button></div>
-                    <div><button style="margin-top: 5px;margin-left: 0px;border-radius: 20px;" class="round-btn">D</button></div>
+                <div style="width: 50%;text-align: center;float: left;height: 100%;font-size:10px;">
+                    <div><button style="margin-top: 25px;margin-left: 120px;border-radius: 20px;" class="round-btn">起飞</button></div>
+                    <div><button style="margin-top: 5px;margin-left: 0px;border-radius: 20px;" class="round-btn">降落</button></div>
                 </div>
             </div>
             <div style="width:100%;text-align:center;">
-                <button id="enter" style="height:25px;width:50px;" class="round-btn">开始</button>
+                <button id="enter" style="height:25px;width:80px;" class="round-btn">开始</button>
             </div>
         </div>
 
         <div id="gameover" style="width:100%;height:100%;z-index:1;display:none;">
             <div class="screen" style="padding-top:7%;">
-                <div class="renderCanvas container" style="height:87%;margin-top:0;">
+                <div class="renderCanvas container" style="height:87%;margin-top:0;overflow-y: scroll;">
                     <div class="container" style="text-align:center;background-image:url('./dist/ct1.png');background-position:center;background-size:cover;height:103%;color:white;">
                         <div style="min-height:80%;">
                             <div id="score-board">
@@ -192,13 +197,13 @@
                         </div>
                     </div>
                 </div>
-                <div style="width: 50%;text-align: center;float: left;height: 100%;">
-                    <div><button style="margin-top: 25px;margin-left: 120px;border-radius: 20px;" class="round-btn">U</button></div>
-                    <div><button style="margin-top: 5px;margin-left: 0px;border-radius: 20px;" class="round-btn">D</button></div>
+                <div style="width: 50%;text-align: center;float: left;height: 100%;font-size:10px;">
+                    <div><button style="margin-top: 25px;margin-left: 120px;border-radius: 20px;" class="round-btn">起飞</button></div>
+                    <div><button style="margin-top: 5px;margin-left: 0px;border-radius: 20px;" class="round-btn">降落</button></div>
                 </div>
             </div>
             <div style="width:100%;text-align:center;">
-                <button id="enter" style="height:25px;width:50px;" class="round-btn">开始</button>
+                <button id="enter" style="height:25px;width:80px;" class="round-btn">开始</button>
             </div>
         </div>
 
@@ -246,13 +251,13 @@
                         </div>
                     </div>
                 </div>
-                <div style="width: 50%;text-align: center;float: left;height: 100%;">
-                    <div><button style="margin-top: 25px;margin-left: 120px;border-radius: 20px;" class="round-btn">U</button></div>
-                    <div><button style="margin-top: 5px;margin-left: 0px;border-radius: 20px;" class="round-btn">D</button></div>
+                <div style="width: 50%;text-align: center;float: left;height: 100%;font-size:10px;">
+                    <div><button style="margin-top: 25px;margin-left: 120px;border-radius: 20px;" class="round-btn">起飞</button></div>
+                    <div><button style="margin-top: 5px;margin-left: 0px;border-radius: 20px;" class="round-btn">降落</button></div>
                 </div>
             </div>
             <div style="width:100%;text-align:center;">
-                <button id="enter" style="height:25px;width:50px;" class="round-btn">开始</button>
+                <button id="enter" style="height:25px;width:80px;" class="round-btn">开始</button>
             </div>
         </div>
 
@@ -261,7 +266,7 @@
                 <canvas id="renderCanvas" class="renderCanvas"></canvas>            
                 <!-- <div class="renderCanvas" style="background-color:white;"></div>            -->
                 <div id="score">
-                    <div style="float:left;width:50%;">score：<span id="score_now">score：</span></div>
+                    <div style="float:left;width:50%;">score：<span id="score_now">0</span></div>
                     <div style="float:left;width:50%;text-align:right">max:<span id="score_history">0</span></div>
                 </div>
             </div>
@@ -285,13 +290,13 @@
                         </div>
                     </div>
                 </div>
-                <div style="width: 50%;text-align: center;float: left;height: 100%;">
-                    <div><button id="Up" style="margin-top: 25px;margin-left: 120px;border-radius: 20px;" class="round-btn">U</button></div>
-                    <div><button id="Dn" style="margin-top: 5px;margin-left: 0px;border-radius: 20px;" class="round-btn">D</button></div>
+                <div style="width: 50%;text-align: center;float: left;height: 100%;font-size:10px;">
+                    <div><button id="Up" style="margin-top: 25px;margin-left: 120px;border-radius: 20px;" class="round-btn">起飞</button></div>
+                    <div><button id="Dn" style="margin-top: 5px;margin-left: 0px;border-radius: 20px;" class="round-btn">降落</button></div>
                 </div>
             </div>
             <div style="width:100%;text-align:center;">
-                <button id="start" style="height:25px;width:50px;" class="round-btn">开始</button>
+                <button id="start" style="height:25px;width:80px;" class="round-btn">开始</button>
             </div>
         </div>
         
